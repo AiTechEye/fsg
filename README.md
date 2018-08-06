@@ -23,10 +23,3 @@ Generally: everyone can add and take.
 
 Other settings in the init.lua:
 You can accept or deny stuff to generate
-
-Craft:
-S = Steelblock
-M = Mese
-[S] [S] [S]
-[S] [M] [S]
-[S] [S] [S]
