@@ -1,6 +1,6 @@
 # fsg: Free stuff genrator: use junk to make usefull stuff
 
-License: CC0
+License: LGPL-2.1
 
 The big box:
 everything in there will be used as power to creat new items.
