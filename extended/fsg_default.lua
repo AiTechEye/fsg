@@ -27,7 +27,7 @@ if minetest.get_modpath("default") then
 	fsg.add_valid("bucket:bucket_water")
 	fsg.add_valid("bucket:bucket_river_water")
 	fsg.add_valid("bucket:bucket_lava")
-	fsg.add_vaild("bucket:bucket_empty")
+	fsg.add_valid("bucket:bucket_empty")
 	fsg.add_valid("default:wool")
 	fsg.add_valid("default:wood")
 	fsg.add_valid("default:leaves")
