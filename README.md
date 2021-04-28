@@ -33,3 +33,5 @@ You can accept or deny stuff to generate
 * laptop
 * moreores
 * airtanks
+
+Or for the full list, look at `settings.lua` starting at line 60.

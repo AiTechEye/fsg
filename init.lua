@@ -1,8 +1,9 @@
 
-local modpath = minetest.get_modpath("fsg")
+fsg_modpath = minetest.get_modpath("fsg")
+fsg = {}
 
 -- Moved settings to settings.lua
-dofile(modpath.."/settings.lua")
+dofile(fsg_modpath.."/settings.lua")
 
 fsg_update=function (pos, elapsed)
 	local meta=minetest.get_meta(pos)
@@ -23,22 +24,26 @@ fsg_update=function (pos, elapsed)
 	end
 	for i=1,32,1 do
 		local t=inv:get_stack("burn",i):get_name()
-		if t~="" then -- Looks like another good thing for a table...
+		if t~="" then
 			local p=0
 			for k, v in ipairs(fsg_burnable_items) do
 				if p==0 and t==k then
 					p = v
 				end
 			end
+			-- Process if it's a part of a group
+			if p==0 then p=minetest.get_item_group(t, "tree")*5 end
+			if p==0 then p=minetest.get_item_group(t, "wood")*6 end
+			if p==0 then p=minetest.get_item_group(t, "sapling")*1 end
+			if p==0 then p=minetest.get_item_group(t, "snappy")*3 end
+			if p==0 then p=minetest.get_item_group(t, "flammable")*3 end
+			if p==0 then p=minetest.get_item_group(t, "choppy")*3 end
+			if p==0 then p=minetest.get_item_group(t, "hot")*10 end
+			if p==0 then p=minetest.get_item_group(t, "igniter")*4 end
+			-- In cases where it's not recognized yet they want it allowed
 			if p == 0 and fsg_allow_all_burns then
 				p = fsg_unknown_burn
 			end
-			if p==0 then p=minetest.get_node_group(t, "tree")*5 end
-			if p==0 then p=minetest.get_node_group(t, "snappy")*3 end
-			if p==0 then p=minetest.get_node_group(t, "flammable")*3 end
-			if p==0 then p=minetest.get_node_group(t, "choppy")*3 end
-			if p==0 then p=minetest.get_node_group(t, "hot")*10 end
-			if p==0 then p=minetest.get_node_group(t, "igniter")*4 end
 			inv:remove_item("burn",t)
 			process=process+p
 			if process>=fsg_to_process then
@@ -81,13 +86,13 @@ meta:set_string("formspec",
 	"listring[current_player;main]"  ..
 	"listring[current_name;done]"
 )
-	meta:set_string("infotext", "Free stuff generator (" .. placer:get_player_name() .. ")")
+	meta:set_string("infotext", "Item Generator (" .. placer:get_player_name() .. ")")
 end
 
 local fsg_for={{7,"_active",1,"default_meselamp.png^default_obsidian_glass.png"},{0,"",0,"default_steel_block.png^default_obsidian_glass.png"}}
 for i = 1, #fsg_for, 1 do
 minetest.register_node("fsg:gen" .. fsg_for[i][2], {
-	description = "Generator",
+	description = "Item Generator",
 	tiles = {"default_steel_block.png^default_obsidian_glass.png",fsg_for[i][4]},
 	groups = {dig_immediate = 3,not_in_creative_inventory = fsg_for[i][3]},
 	paramtype2 = "facedir",
@@ -213,4 +218,3 @@ minetest.register_craft({
 	}
 })
 end
-fsg_craft=nil
