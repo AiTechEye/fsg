@@ -2,14 +2,19 @@
 fsg_craft=true
 
 -- Time till the process is done?
+-- See below comment on fsg_to_pro
 fsg_to_process=100
 
--- Shows in X percent (I.E. shows in % example: 5/500 = 1)
-fsg_to_pro=5
+--[[ Percent of process (I.E. 5/500 = 1, 10/1000 = 1, default=5)
+     This is the amount compared to the fsg_to_process.
+     That is if process is 100 and this is 1, then something like bucket:bucket_lava set to 80,
+     means it will produce 80% of the item. (I.E. default:wood giving say 10 will need 10 items to make 1 item)
+--]]
+fsg_to_pro=1
 
 -- Items that are invalid to be generated
 -- Also could be called a blacklist
-fsg_invalid_items={"fsg:gen"}
+fsg_invalid_items={"fsg:gen", "fsg:gen2"}
 
 -- Allow everything not in fsg_invalid_items? (Doesn't use fsg_valid to check it's something to use)
 -- Quite dangerous since it accepts almost everything (Except fsg_invalid_items)
@@ -32,6 +37,7 @@ fsg_burnable_items = {}
 
 -- API begins --
 -- Just uses the fsg namespace (See examples.lua)
+fsg_api_log_level = "verbose"
 
 -- Returns if item was added successfully added (can be thrown away)
 function fsg.add_invalid(itemstring)
@@ -40,6 +46,7 @@ function fsg.add_invalid(itemstring)
 		if v == itemstring then return false end
 	end
 	table.insert(fsg_invalid_items, itemstring)
+	minetest.log(fsg_api_log_level, "[fsg] Received API call for invalid '"..itemstring.."'.")
 	return true
 end
 
@@ -57,6 +64,7 @@ function fsg.add_valid(itemstring)
 		if v == itemstring then return false end
 	end
 	table.insert(fsg_valid_items, itemstring)
+	minetest.log(fsg_api_log_level, "[fsg] Received API call for valid '"..itemstring.."'.")
 	return true
 end
 
@@ -74,15 +82,16 @@ function fsg.add_burnable(itemstring, time)
 	for k, v in ipairs(fsg_burnable_items) do
 		if k == itemstring then return false end
 	end
-	fsg_burnable_items[itemstring] = time
+	fsg_burnable_items.itemstring = time
+	minetest.log(fsg_api_log_level, "[fsg] Received API call for burnable '"..itemstring.."' = "..time..".")
 	return true
 end
 
 function fsg.is_burnable(itemstring)
 	for k, v in ipairs(fsg_burnable_items) do
-		if k == itemstring then return true end
+		if k == itemstring then return v end
 	end
-	return false
+	return 0
 end
 
 -- End of API --
