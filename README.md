@@ -2,17 +2,17 @@
 
 License: LGPL-2.1
 
-## The big box:
+## The big box (Burn area)
 
 Everything in there will be used as power to creat new items.
 (make sure it not becomes empty or the process will fail and restart over again)
 
-## Left top corner: 
+## Left top corner (Product area & Done area)
 
 Add stuff that will be cloned, the results will be placed in the right side
 (make shore it not becomes full)
 
-## Buttons and the textbox:
+## Buttons and the textbox
 
 You can let other people contribute or use the generator, (press to cycle status)
 
@@ -20,15 +20,15 @@ but only add to burn or take from the results.
 
 Write the players names (1 name at every line) then press save.
 
-## Locked
+### Locked
 
 Only you can add and take.
 
-## Members
+### Members
 
 Averyone can add, you and members can take.
 
-## Generally
+### Generally
 
 Everyone can add and take.
 
@@ -91,7 +91,7 @@ Where as a Item Factory (fsg:gen2) simply requires a product and gets to work pr
 ## Upgrading a Generator to a Factory
 
 1. Simply stick your Item Generator into the furnace with plenty of fuel for the furnace.
-2. Wait 5 minutes till you get your Item Factory from the furnace.
+2. Wait 5 minutes till you get your Item Factory from the furnace. (With coal lumps and a furnace, it took 8 coal to produce 1 Factory)
 
 ## Downgrading a Factory to a Generator
 
