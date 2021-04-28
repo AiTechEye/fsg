@@ -23,3 +23,13 @@ Generally: everyone can add and take.
 
 Other settings in the init.lua:
 You can accept or deny stuff to generate
+
+## Mods Supported
+
+* technic
+* drawers
+* schemedit
+* moreblocks
+* laptop
+* moreores
+* airtanks

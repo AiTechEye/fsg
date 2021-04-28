@@ -1,17 +1,8 @@
-fsg_craft=true			--is craftable
-fsg_to_process=500		--before it done
-fsg_to_pro=5			--shows in % example: (5/500 = 1) (10/1000 = 1) ...
-				--to add an item: "mod:item",
-fsg_not_generatable={		-- not will be generated
-"fsg:gen",
-"default:diamondblock",
-"default:lava_source",
-"bucket:bucket_lava",
-}
 
-fsg_generatable={}			-- will be generated but nothing else (leave to accept all)
+local modpath = minetest.get_modpath("fsg")
 
-
+-- Moved settings to settings.lua
+dofile(modpath.."/settings.lua")
 
 fsg_update=function (pos, elapsed)
 	local meta=minetest.get_meta(pos)
@@ -22,9 +13,9 @@ fsg_update=function (pos, elapsed)
 	if inv:is_empty("gen") or inv:room_for_item("done",gen)==false or inv:is_empty("burn") then
 		minetest.get_node_timer(pos):stop()
 		meta:set_int("proc",0)
-		if inv:room_for_item("done",gen)==false then meta:set_string("infotext", "Free stuff generator [the generator is full (right corner)] (" .. meta:get_string("owner") .. ")") end
-		if inv:is_empty("gen") then meta:set_string("infotext", "Free stuff generator [Failed: add something to generate (in left cornter)] (" .. meta:get_string("owner") .. ")") end
-		if inv:is_empty("burn") then meta:set_string("infotext", "Free stuff generator [Failed: add stuff to burn] (" .. meta:get_string("owner") .. ")") end
+		if inv:room_for_item("done",gen)==false then meta:set_string("infotext", "Item Generator [Full] (" .. meta:get_string("owner") .. ")") end
+		if inv:is_empty("gen") then meta:set_string("infotext", "Item Generator [No Product] (" .. meta:get_string("owner") .. ")") end
+		if inv:is_empty("burn") then meta:set_string("infotext", "Item Generator [No Junk] (" .. meta:get_string("owner") .. ")") end
 
 
 		minetest.swap_node(pos, {name ="fsg:gen"})
@@ -32,18 +23,22 @@ fsg_update=function (pos, elapsed)
 	end
 	for i=1,32,1 do
 		local t=inv:get_stack("burn",i):get_name()
-		if t~="" then
+		if t~="" then -- Looks like another good thing for a table...
 			local p=0
-			if p==0 and t=="default:coalblock" then p=40 end
-			if p==0 and t=="default:coal_lump" then p=10 end
-			if p==0 and t=="bucket:bucket_lava" then p=40 end
+			for k, v in ipairs(fsg_burnable_items) do
+				if p==0 and t==k then
+					p = v
+				end
+			end
+			if p == 0 and fsg_allow_all_burns then
+				p = fsg_unknown_burn
+			end
 			if p==0 then p=minetest.get_node_group(t, "tree")*5 end
 			if p==0 then p=minetest.get_node_group(t, "snappy")*3 end
 			if p==0 then p=minetest.get_node_group(t, "flammable")*3 end
 			if p==0 then p=minetest.get_node_group(t, "choppy")*3 end
 			if p==0 then p=minetest.get_node_group(t, "hot")*10 end
 			if p==0 then p=minetest.get_node_group(t, "igniter")*4 end
-			if p==0 then p=1 end
 			inv:remove_item("burn",t)
 			process=process+p
 			if process>=fsg_to_process then
@@ -51,7 +46,7 @@ fsg_update=function (pos, elapsed)
 				inv:add_item("done",gen)
 			end
 			meta:set_int("proc",process)
-			meta:set_string("infotext", "Free stuff generator " .. (process/fsg_to_pro)  .."% (" .. meta:get_string("owner") .. ")")
+			meta:set_string("infotext", "Item Generator " .. (process/fsg_to_pro)  .."% (" .. meta:get_string("owner") .. ")")
 			break
 		end
 	end
@@ -114,20 +109,22 @@ after_place_node = function(pos, placer, itemstack)
 		fsg_inv(placer,pos)
 		end,
 allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		if fsg_generatable[1]~=nil and listname=="gen" then		--accepted things (if somehing is added)
+		if (fsg_valid_items[1]~=nil) and listname=="gen" then		--accepted things (if something is added)
 			local cbg=0
 			local item=stack:get_name()
-			for i, it in pairs(fsg_generatable) do
-				if it==item then
-					cbg=1
-					break
-				end
-			end
+			if not fsg_allow_all then -- Only do this if fsg_allow_all is false (Or undefined)
+			    for i, it in pairs(fsg_valid_items) do
+				    if it==item then
+					    cbg=1
+					    break
+				    end
+			    end
+			else cbg=1 end -- Hey look it's a valid item :) (Only if fsg_allow_all is true)
 			if cbg==0 then return 0 end
 		end
 		if listname=="gen" then
 			local item=stack:get_name()
-			for i, it in pairs(fsg_not_generatable) do		---not accepted things
+			for i, it in pairs(fsg_invalid_items) do --not accepted
 				if it==item then return 0 end
 			end
 		end
@@ -209,10 +206,10 @@ end
 if fsg_craft~=false then
 minetest.register_craft({
 	output = "fsg:gen",
-	recipe = {
-		{"default:steelblock", "default:steelblock", "default:steelblock"},
-		{"default:steelblock", "default:mese", "default:steelblock"},
-		{"default:steelblock", "default:steelblock", "default:steelblock"},
+	recipe = { -- Changed from steelblock to diamondblock (Make it more expensive so folks can't use it as much)
+		{"default:diamondblock", "default:diamondblock", "default:diamondblock"},
+		{"default:diamondblock", "default:mese", "default:diamondblock"},
+		{"default:diamondblock", "default:diamondblock", "default:diamondblock"},
 	}
 })
 end
