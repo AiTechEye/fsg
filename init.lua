@@ -24,7 +24,7 @@ fsg_update=function (pos, elapsed)
 	end
 	for i=1,32,1 do
 		local t=inv:get_stack("burn",i):get_name()
-		if t~="" then
+		if t~="" and fsg.is_burnable() then
 			local p=0
 			for k, v in ipairs(fsg_burnable_items) do
 				if p==0 and t==k then
@@ -118,19 +118,16 @@ allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 			local cbg=0
 			local item=stack:get_name()
 			if not fsg_allow_all then -- Only do this if fsg_allow_all is false (Or undefined)
-			    for i, it in pairs(fsg_valid_items) do
-				    if it==item then
-					    cbg=1
-					    break
-				    end
-			    end
+				if fsg.is_valid(item) then
+					cbg=1
+				end
 			else cbg=1 end -- Hey look it's a valid item :) (Only if fsg_allow_all is true)
 			if cbg==0 then return 0 end
 		end
 		if listname=="gen" then
 			local item=stack:get_name()
-			for i, it in pairs(fsg_invalid_items) do --not accepted
-				if it==item then return 0 end
+			if fsg.is_invalid(item) then -- Only allow items if not in invalid list
+				return 0
 			end
 		end
 		local meta=minetest.get_meta(pos)
@@ -218,3 +215,5 @@ minetest.register_craft({
 	}
 })
 end
+
+minetest.log("action", "[fsg] Loaded!")
